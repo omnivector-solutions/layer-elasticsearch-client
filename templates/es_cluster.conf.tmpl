@@ -1,0 +1,5 @@
+upstream es_cluster {
+  {% for es in es_servers %}
+    server {{ es.host }}:{{ es.port }};
+  {% endfor %}
+}

@@ -1,0 +1,11 @@
+server {
+  listen *:9200;
+
+  location / {
+    # Only proxy local requests for ES.
+    allow 127.0.0.1;
+    deny all;
+    proxy_pass http://es_cluster;
+    proxy_read_timeout 90;
+  }
+}
