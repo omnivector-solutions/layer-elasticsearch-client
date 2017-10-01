@@ -11,7 +11,7 @@ relation to elasticsearch before setting the flag
 `elasticsearch.client.available`.
 
 Once the flag `elasticsearch.client.available` you can rest assured that your
-application can talk to elasticsearch.
+application can talk to elasticsearch via `http://127.0.0.1:9200`.
 
 
 ### Authors
