@@ -1,17 +1,9 @@
-import os
-from subprocess import call
-from multiprocessing import cpu_count
-
 from charmhelpers.core import unitdata
-from charmhelpers.core.host import chownr, chdir
 from charmhelpers.core.hookenv import (
     config,
-    local_unit,
     log,
     status_set,
 )
-
-from charmhelpers.core.templating import render
 
 from charms.reactive import (
     when,
@@ -20,6 +12,8 @@ from charms.reactive import (
     set_state,
     remove_state
 )
+
+from charms.layer.nginx import configure_site
 
 
 kv = unitdata.kv()
