@@ -1,0 +1,6 @@
+options:
+  es-hosts:
+    type: string
+    default: ""
+    description: |
+        Elasticsearch hosts as comma deleniated string

@@ -1,0 +1,20 @@
+name: elasticsearch-client
+summary: Elasticsearch client layer
+maintainer: James Beedy <jamesbeedy@gmail.com>
+description: |
+  This layer provides the reactive client layer for elasticsearch.
+  NGINX is used to create loadbalancing proxy to elasticsearch, when new
+  elasticsearch members are added to the cluster, this charm will re-render the elasticsearch
+  lb-proxy config with the current hosts in the cluster and reload NGINX.
+
+  This means you can point your application config at "http://127.0.0.1:9200" and this layer will
+  do the rest.
+tags:
+  - elasticsearch
+  - django
+  - flask
+  - rails
+  - client
+requires:
+  elasticsearch:
+    interface: elasticsearch
