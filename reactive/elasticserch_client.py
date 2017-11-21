@@ -6,7 +6,7 @@ from charmhelpers.core.hookenv import (
 )
 
 from charms.reactive import (
-    context,
+    endpoint_from_name,
     when,
     when_any,
     when_not,
@@ -44,8 +44,7 @@ def render_elasticsearch_lb():
                'Configuring application for elasticsearch')
 
     ES_SERVERS = []
-    nodes = context.endpoints.elasticsearch.relation_data()
-    for unit in nodes:
+    for unit in endpoint_from_name('elasticsearch'):
         ES_SERVERS.append(unit['host'])
 
     kv.set('es_hosts', ES_SERVERS)
