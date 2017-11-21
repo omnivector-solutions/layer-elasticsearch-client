@@ -17,4 +17,4 @@ tags:
   - client
 requires:
   elasticsearch:
-    interface: elasticsearch
+    interface: "elasticsearch"
