@@ -6,7 +6,7 @@ from charmhelpers.core.hookenv import (
 )
 
 from charms.reactive import (
-    endpoint_from_name,
+    endpoint_from_flag,
     when,
     when_any,
     when_not,
@@ -36,7 +36,7 @@ def check_user_provided_elasticsearch():
     set_flag('manual.elasticsearch.check.available')
 
 
-@when('endpoint.elasticsearch.host-port')
+@when('elasticsearch.available')
 def render_elasticsearch_lb():
     """Write render elasticsearch cluster loadbalancer
     """
@@ -44,8 +44,9 @@ def render_elasticsearch_lb():
                'Configuring application for elasticsearch')
 
     ES_SERVERS = []
-    for unit in endpoint_from_name('elasticsearch'):
-        ES_SERVERS.append(unit['host'])
+    for application in endpoint_from_flag('elasticsearch.available'):
+        for unit in application['hosts']:
+            ES_SERVERS.append("{}:{}".format(unit['host'], unit['port']))
 
     kv.set('es_hosts', ES_SERVERS)
 
@@ -63,14 +64,10 @@ def render_elasticsearch_lb():
 def configure_es_proxy_hosts():
     """Write out the nginx config containing the es servers
     """
-
-    ES_SERVERS = []
-
-    for host in kv.get('es_hosts'):
-        ES_SERVERS.append({'host': host, 'port': "9200"})
+    status_set('maintenance', 'Configuring elasticsearch loadbalancing proxy')
 
     configure_site('es_cluster', 'es_cluster.conf.tmpl',
-                   es_servers=ES_SERVERS)
+                   es_servers=kv.get('es_hosts'))
 
     set_flag('elasticsearch.client.proxy.available')
 
@@ -80,7 +77,6 @@ def configure_es_proxy_hosts():
 def render_elasticsearch_lb_proxy():
     """Write out elasticsearch lb proxy
     """
-    status_set('maintenance', 'Configuring elasticsearch loadbalancing proxy')
     configure_site('es_lb_proxy', 'es_lb_proxy.conf.tmpl')
     status_set('active', 'Elasticsearch loadbalancer/proxy configured')
     set_flag('elasticsearch.lb.proxy.available')
