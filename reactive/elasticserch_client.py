@@ -36,7 +36,7 @@ def check_user_provided_elasticsearch():
     set_flag('manual.elasticsearch.check.available')
 
 
-@when('elasticsearch.available')
+@when('endpoint.elasticsearch.joined')
 def render_elasticsearch_lb():
     """Write render elasticsearch cluster loadbalancer
     """
@@ -44,15 +44,14 @@ def render_elasticsearch_lb():
                'Configuring application for elasticsearch')
 
     ES_SERVERS = []
-    for application in endpoint_from_flag('elasticsearch.available'):
-        for unit in application['hosts']:
-            ES_SERVERS.append("{}:{}".format(unit['host'], unit['port']))
+    for es in endpoint_from_flag(
+       'endpoint.elasticsearch.joined').relation_data():
+            ES_SERVERS.append("{}:{}".format(es['host'], es['port']))
 
     kv.set('es_hosts', ES_SERVERS)
 
     status_set('active', 'Elasticsearch available')
 
-    clear_flag('elasticsearch.broken')
     clear_flag('elasticsearch.client.proxy.available')
     set_flag('juju.elasticsearch.available')
 
@@ -83,7 +82,8 @@ def render_elasticsearch_lb_proxy():
     set_flag('elasticsearch.client.available')
 
 
-@when_any('elasticsearch.broken',
+@when_any('endpoint.elasticsearch.broken',
+          'endpoint.elasticsearch.changed',
           'config.changed.es-hosts')
 @when('elasticsearch.lb.proxy.available')
 def modify_elasticsearch_state():
