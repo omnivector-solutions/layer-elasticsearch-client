@@ -10,6 +10,7 @@ from charms.reactive import (
     when,
     when_any,
     when_not,
+    when_none,
     set_flag,
     clear_flag
 )
@@ -20,11 +21,17 @@ from charms.layer.nginx import configure_site
 kv = unitdata.kv()
 
 
+def test_out(flag):
+    with open('/home/ubuntu/{}'.format(flag), 'a') as f:
+        f.write(flag)
+
+
 @when_not('manual.elasticsearch.check.available')
 def check_user_provided_elasticsearch():
     status_set('maintenance', 'Checking for elasticsearch config')
     if not config('es-hosts'):
         clear_flag('manual.elasticsearch.available')
+        clear_flag('elasticsearch.client.proxy.available')
         log('Manual elasticsearch not configured')
         status_set('active',
                    'Elasticsearch manual configuration NOT available')
@@ -33,10 +40,13 @@ def check_user_provided_elasticsearch():
         set_flag('manual.elasticsearch.available')
         clear_flag('elasticsearch.client.proxy.available')
         status_set('active', 'Elasticsearch manual configuration available')
+
+    test_out('manual.elasticsearch.check.available')
     set_flag('manual.elasticsearch.check.available')
 
 
 @when('endpoint.elasticsearch.joined')
+@when_not('juju.elasticsearch.available')
 def render_elasticsearch_lb():
     """Write render elasticsearch cluster loadbalancer
     """
@@ -53,6 +63,9 @@ def render_elasticsearch_lb():
     status_set('active', 'Elasticsearch available')
 
     clear_flag('elasticsearch.client.proxy.available')
+    clear_flag('endpoint.elasticsearch.joined')
+
+    test_out('juju.elasticsearch.available')
     set_flag('juju.elasticsearch.available')
 
 
@@ -68,25 +81,33 @@ def configure_es_proxy_hosts():
     configure_site('es_cluster', 'es_cluster.conf.tmpl',
                    es_servers=kv.get('es_hosts'))
 
+    test_out('elasticsearch.client.proxy.available')
     set_flag('elasticsearch.client.proxy.available')
 
 
-@when('elasticsearch.client.proxy.available')
+@when('nginx.available')
 @when_not('elasticsearch.lb.proxy.available')
 def render_elasticsearch_lb_proxy():
     """Write out elasticsearch lb proxy
     """
     configure_site('es_lb_proxy', 'es_lb_proxy.conf.tmpl')
     status_set('active', 'Elasticsearch loadbalancer/proxy configured')
+
+    test_out('elasticsearch.lb.proxy.available')
     set_flag('elasticsearch.lb.proxy.available')
+
+
+@when_any('juju.elasticsearch.available',
+          'manual.elasticsearch.available')
+@when('elasticsearch.lb.proxy.available',
+      'elasticsearch.client.proxy.available')
+def set_es_client_avail():
+    test_out('elasticsearch.client.available')
     set_flag('elasticsearch.client.available')
 
 
-@when_any('endpoint.elasticsearch.broken',
-          'endpoint.elasticsearch.changed',
-          'config.changed.es-hosts')
-@when('elasticsearch.lb.proxy.available')
-def modify_elasticsearch_state():
-    clear_flag('manual.elasticsearch.check.available')
-    clear_flag('juju.elasticsearch.available')
-    clear_flag('elasticsearch.client.proxy.available')
+@when_none('juju.elasticsearch.available',
+           'manual.elasticsearch.available')
+def need_relation_configuration_status():
+    status_set('blocked', "Need relation/configuration for Elasticsearch")
+    return
