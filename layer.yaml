@@ -2,4 +2,4 @@ includes:
   - 'layer:basic'
   - 'layer:nginx'
   - 'interface:elasticsearch'
-repo: 'https://github.com/jamesbeedy/layer-elasticsearch-client'
+repo: 'https://github.com/omnivector-solutions/layer-elasticsearch-client'
