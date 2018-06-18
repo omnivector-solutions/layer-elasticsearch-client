@@ -53,7 +53,7 @@ def render_elasticsearch_lb():
 
     ES_SERVERS = []
     for es in endpoint_from_flag(
-       'endpoint.elasticsearch.available').relation_data():
+       'endpoint.elasticsearch.available').list_unit_data():
             ES_SERVERS.append("{}:{}".format(es['host'], es['port']))
 
     kv.set('es_hosts', ES_SERVERS)
