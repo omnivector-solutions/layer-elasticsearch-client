@@ -7,11 +7,6 @@ from charms.layer import nginx
 
 kv = unitdata.kv()
 
-reactive.register_trigger(
-    when='endpoint.elasticsearch.changed',
-    clear_flag='juju.elasticsearch.available'
-)
-
 
 @reactive.when_not('manual.elasticsearch.check.available')
 def check_user_provided_elasticsearch():
@@ -37,7 +32,6 @@ def check_user_provided_elasticsearch():
 
 
 @reactive.when('endpoint.elasticsearch.available')
-@reactive.when_not('juju.elasticsearch.available')
 def render_elasticsearch_lb():
     """Write render elasticsearch cluster loadbalancer
     """
@@ -75,6 +69,7 @@ def configure_es_proxy_hosts():
                        'Elasticsearch loadbalancer/proxy configured {}'.format(
                            ",".join(kv.get('es_hosts'))))
 
+    reactive.clear_flag('juju.elasticsearch.available')
     reactive.set_flag('elasticsearch.client.proxy.available')
 
 
