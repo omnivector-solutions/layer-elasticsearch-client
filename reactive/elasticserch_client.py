@@ -66,8 +66,8 @@ def configure_es_proxy_hosts():
                          es_servers=kv.get('es_hosts'))
 
     hookenv.status_set('active',
-                       'Elasticsearch loadbalancer/proxy configured {}'.format(
-                           ",".join(kv.get('es_hosts'))))
+                       'Elasticsearch loadbalancer/proxy configured')
+   
 
     reactive.clear_flag('juju.elasticsearch.available')
     reactive.set_flag('elasticsearch.client.proxy.available')
