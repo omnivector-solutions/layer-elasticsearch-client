@@ -22,7 +22,7 @@ def check_user_provided_elasticsearch():
         hookenv.status_set('active',
                            'Elasticsearch manual configuration available')
 
-        kv.set('es_hosts', reactive.config('es-hosts').split(","))
+        kv.set('es_hosts', hookenv.config('es-hosts').split(","))
 
         hookenv.set_flag('manual.elasticsearch.available')
 
