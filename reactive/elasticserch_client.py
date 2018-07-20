@@ -24,7 +24,7 @@ def check_user_provided_elasticsearch():
 
         kv.set('es_hosts', hookenv.config('es-hosts').split(","))
 
-        hookenv.set_flag('manual.elasticsearch.available')
+        reactive.set_flag('manual.elasticsearch.available')
 
         reactive.clear_flag('elasticsearch.client.proxy.available')
 
