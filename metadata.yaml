@@ -11,10 +11,6 @@ description: |
   do the rest.
 tags:
   - elasticsearch
-  - django
-  - flask
-  - rails
-  - client
 requires:
   elasticsearch:
     interface: "elasticsearch"

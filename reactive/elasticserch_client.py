@@ -83,8 +83,6 @@ def render_elasticsearch_lb_proxy():
     reactive.set_flag('elasticsearch.lb.proxy.available')
 
 
-@reactive.when_any('juju.elasticsearch.available',
-                   'manual.elasticsearch.available')
 @reactive.when('elasticsearch.lb.proxy.available',
                'elasticsearch.client.proxy.available')
 def set_es_client_avail():
